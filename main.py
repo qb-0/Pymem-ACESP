@@ -1,4 +1,4 @@
-from pymem import Pymem, memory
+from pymem import Pymem
 from pyray import *
 from helper import *
 from ctypes import *
@@ -21,7 +21,7 @@ def main():
     base = proc.base_address
 
     while not window_should_close():
-        matrix = memory.read_ctype(proc.process_handle, base + Pointer.view_matrix, (16 * c_float)(), get_py_value=False)[:]
+        matrix = proc.read_ctype(base + Pointer.view_matrix, (16 * c_float)(), get_py_value=False)[:]
         player_count = proc.read_int(base + Pointer.player_count)
 
         begin_drawing()
@@ -29,20 +29,20 @@ def main():
         draw_fps(0, 0)
         
         if player_count > 1:
-            ents = memory.read_ctype(
-                proc.process_handle, 
+            ents = proc.read_ctype(
                 proc.read_int(base + Pointer.entity_list), 
                 (player_count * c_int)(), 
                 get_py_value=False
             )[1:]
             for ent_addr in ents:
-                ent_obj = memory.read_ctype(proc.process_handle, ent_addr, Entity(), get_py_value=False)
-                try:
-                    wts = world_to_screen(matrix, ent_obj.pos)
-                except:
-                    continue
-                draw_line(get_screen_width() // 2, get_screen_height() // 2, wts.x, wts.y, BLUE if ent_obj.team else RED)
-                draw_text(ent_obj.name, wts.x, wts.y, 12, WHITE)
+                ent_obj = proc.read_ctype(ent_addr, Entity(), get_py_value=False)
+                if ent_obj.health > 0:
+                    try:
+                        wts = world_to_screen(matrix, ent_obj.pos)
+                    except:
+                        continue
+                    draw_line(get_screen_width() // 2, get_screen_height() // 2, wts.x, wts.y, BLUE if ent_obj.team else RED)
+                    draw_text(ent_obj.name, wts.x, wts.y, 12, WHITE)
 
         end_drawing()
 

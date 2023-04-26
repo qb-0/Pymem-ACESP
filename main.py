@@ -21,7 +21,7 @@ def main():
     base = proc.base_address
 
     while not window_should_close():
-        matrix = proc.read_ctype(base + Pointer.view_matrix, (16 * c_float)(), get_py_value=False)[:]
+        matrix = proc.read_ctype(base + Pointer.view_matrix, (16 * c_float)())[:]
         player_count = proc.read_int(base + Pointer.player_count)
 
         begin_drawing()
@@ -35,7 +35,7 @@ def main():
                 get_py_value=False
             )[1:]
             for ent_addr in ents:
-                ent_obj = proc.read_ctype(ent_addr, Entity(), get_py_value=False)
+                ent_obj = proc.read_ctype(ent_addr, Entity())
                 if ent_obj.health > 0:
                     try:
                         wts = world_to_screen(matrix, ent_obj.pos)

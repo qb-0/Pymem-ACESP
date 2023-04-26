@@ -29,11 +29,7 @@ def main():
         draw_fps(0, 0)
         
         if player_count > 1:
-            ents = proc.read_ctype(
-                proc.read_int(base + Pointer.entity_list), 
-                (player_count * c_int)(), 
-                get_py_value=False
-            )[1:]
+            ents = proc.read_ctype(proc.read_int(base + Pointer.entity_list), (player_count * c_int)())[1:]
             for ent_addr in ents:
                 ent_obj = proc.read_ctype(ent_addr, Entity())
                 if ent_obj.health > 0:
